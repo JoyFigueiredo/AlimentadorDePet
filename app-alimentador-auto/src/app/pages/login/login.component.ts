@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { DefaultLoginLayoutComponent } from '../../components/default-login-layout/default-login-layout.component';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +16,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 export class LoginComponent {
   loginForm!: FormGroup;
 
-  constructor(){
+  constructor(private router: Router){
     this.loginForm = new FormGroup({
       qntVolta: new FormControl('', [Validators.required, Validators.min(1)]),
       data: new FormControl('', Validators.required),
@@ -23,4 +24,10 @@ export class LoginComponent {
     });
   }
 }
+
+irParaAlimentar() {
+  this.router.navigate(['/alimentar']);
+}
+
+
 
