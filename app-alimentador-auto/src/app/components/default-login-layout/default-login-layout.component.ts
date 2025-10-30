@@ -12,3 +12,11 @@ export class DefaultLoginLayoutComponent {
   @Input() primaryBtnText: string = "";
   @Input() secondaryBtnText: string = "";
 }
+
+@Output() primaryBtnClick = new EventEmitter<void>();
+
+onPrimaryClick() {
+  this.primaryBtnClick.emit();
+}
+
+
