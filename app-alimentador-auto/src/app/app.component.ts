@@ -1,12 +1,56 @@
 import { Component } from '@angular/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, HttpClientModule, CommonModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app-alimentador-auto';
+  title = '🐾 Alimentador Automático';
+  menuSelecionado: string | null = null;
+  lcdText = 'Pronto';
+  horario: string | null = null;
+
+  private espUrl = 'http://192.168.1.50'; // IP fixo do ESP
+
+  constructor(private http: HttpClient) {}
+
+  selecionarMenu(menu: string) {
+    this.menuSelecionado = menu;
+    this.lcdText = `Menu: ${menu}`;
+
+    if (menu === 'horario') {
+      this.obterHorario();
+    }
+  }
+
+  enviarAcao(acao: string) {
+    this.http.get(`${this.espUrl}/${acao}`).subscribe({
+      next: (res: any) => {
+        this.lcdText = `Executando: ${acao}`;
+        console.log('Comando enviado:', res);
+      },
+      error: (err) => {
+        this.lcdText = 'Erro de conexão';
+        console.error(err);
+      }
+    });
+  }
+
+  obterHorario() {
+    this.http.get(`${this.espUrl}/hora`).subscribe({
+      next: (res: any) => {
+        this.horario = res.hora;
+        this.lcdText = `Hora: ${res.hora}`;
+      },
+      error: () => {
+        this.lcdText = 'Erro ao obter hora';
+      }
+    });
+  }
 }

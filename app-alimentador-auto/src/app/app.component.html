@@ -1,2 +1,25 @@
-<router-outlet/>
+<div class="container">
+  <h1>🐾 Alimentador Automático</h1>
 
+  <div class="menu">
+    <button (click)="selecionarMenu('alimentar')">🍖 Alimentar</button>
+    <button (click)="selecionarMenu('horario')">⏰ Horário</button>
+  </div>
+
+  <div *ngIf="menuSelecionado === 'alimentar'" class="submenu">
+    <h2>Quantidade:</h2>
+    <button (click)="enviarAcao('alimentar/0.25')">1/4 volta</button>
+    <button (click)="enviarAcao('alimentar/0.5')">1/2 volta</button>
+    <button (click)="enviarAcao('alimentar/1')">1 volta</button>
+    <button (click)="enviarAcao('alimentar/personalizado')">Personalizar</button>
+  </div>
+
+  <div *ngIf="menuSelecionado === 'horario'">
+    <h2>Horário Atual:</h2>
+    <p>{{ horario || 'Obtendo hora...' }}</p>
+  </div>
+
+  <div class="lcd">
+    <p>{{ lcdText }}</p>
+  </div>
+</div>
