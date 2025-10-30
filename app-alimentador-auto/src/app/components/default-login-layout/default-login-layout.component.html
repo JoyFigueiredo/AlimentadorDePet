@@ -1,15 +1,18 @@
 <main>
-  <section>
-    <img src="/assets/svg/logo.svg"/>
-    <h1></h1>
-    <button></button>
-    <div>
-      <span>or</span>
+  <section class="form-section">
+    <img class="logo" src="/assets/svg/logo.svg" />
+    <h1>{{title}}</h1>
+    <ng-content>
+      
+    </ng-content>
+    <div class="btn-wrapper">
+      <button class="btn-primary">{{primaryBtnText}}</button>
+      <div class="divider">
+        <div></div>
+        <span>or</span>
+        <div></div>
+      </div>
+      <button class="btn-secondary">{{secondaryBtnText}}</button>
     </div>
-    <button></button>
-  </section>
-  <section>
-    <h1>You Should, MaveIt</h1>
-    <img src="/assets/svg/Delivery.svg"/>
   </section>
 </main>

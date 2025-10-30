@@ -1,11 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { ɵEmptyOutletComponent } from "@angular/router";
 
 @Component({
   selector: 'app-default-login-layout',
-  imports: [],
+  imports: [ɵEmptyOutletComponent],
   templateUrl: './default-login-layout.component.html',
   styleUrl: './default-login-layout.component.css'
 })
 export class DefaultLoginLayoutComponent {
-
+  @Input() title: string = "";
+  @Input() primaryBtnText: string = "";
+  @Input() secondaryBtnText: string = "";
 }
