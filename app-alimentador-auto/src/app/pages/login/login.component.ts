@@ -17,9 +17,10 @@ export class LoginComponent {
 
   constructor(){
     this.loginForm = new FormGroup({
-      qntVolta: new FormControl(''),
-      data: new FormControl(''),
-      hota: new FormControl('');
+      qntVolta: new FormControl('', [Validators.required, Validators.min(1)]),
+      data: new FormControl('', Validators.required),
+      hora: new FormControl('', Validators.required);
     });
   }
 }
+
