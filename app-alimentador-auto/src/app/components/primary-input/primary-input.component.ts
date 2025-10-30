@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 
-type InputTypes = "qntVolta" | "data" | "hora"
+type InputTypes = "text" |"qntVolta" | "data" | "hora"
 
 @Component({
   selector: 'app-primary-input',
@@ -11,4 +12,6 @@ type InputTypes = "qntVolta" | "data" | "hora"
 })
 export class PrimaryInputComponent {
   @Input() type: InputTypes = "text";
+  @Input() formQnt: string = "";
+  @Input() placeholder: string="";
 }

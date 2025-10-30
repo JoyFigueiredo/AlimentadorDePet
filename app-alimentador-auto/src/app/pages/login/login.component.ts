@@ -19,7 +19,7 @@ export class LoginComponent {
     this.loginForm = new FormGroup({
       qntVolta: new FormControl(''),
       data: new FormControl(''),
-      hota: new FormControl('')
-    })
+      hota: new FormControl('');
+    });
   }
 }
