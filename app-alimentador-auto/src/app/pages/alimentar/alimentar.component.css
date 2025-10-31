@@ -1,0 +1,29 @@
+.alimentar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.controle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+input[type="number"] {
+  width: 60px;
+  text-align: center;
+  font-size: 18px;
+}
+
+button.enviar {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #96C358;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}

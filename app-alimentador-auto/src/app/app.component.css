@@ -1,0 +1,7 @@
+.content {
+  margin-top: 80px; /* espaço pro header fixo */
+  margin-bottom: 50px; /* espaço pro footer fixo */
+  min-height: calc(100vh - 130px);
+  padding: 20px;
+  box-sizing: border-box;
+}

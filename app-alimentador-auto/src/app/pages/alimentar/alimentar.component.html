@@ -1,1 +1,11 @@
-<p>alimentar works!</p>
+<div class="alimentar-container">
+  <h2>🍖 Alimentar</h2>
+
+  <div class="controle">
+    <button (click)="diminuir()">−</button>
+    <input type="number" [(ngModel)]="quantidade" step="0.1" min="0.1" max="2" readonly>
+    <button (click)="aumentar()">+</button>
+  </div>
+
+  <button class="enviar" (click)="enviar()">Enviar</button>
+</div>

@@ -2,11 +2,18 @@ import { Component } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HttpClientModule, CommonModule],
+  imports: [
+    RouterOutlet,
+    CommonModule,
+    HeaderComponent,
+    FooterComponent
+  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -18,7 +25,7 @@ export class AppComponent {
 
   private espUrl = 'http://192.168.1.50'; // IP fixo do ESP
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   selecionarMenu(menu: string) {
     this.menuSelecionado = menu;

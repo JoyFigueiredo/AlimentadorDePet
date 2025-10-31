@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DefaultLoginLayoutComponent } from '../../components/default-login-layout/default-login-layout.component';
+import { DefaultloginLayoutComponent } from '../../components/default-login-layout/default-login-layout.component';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -7,27 +7,28 @@ import { Router } from '@angular/router';
   selector: 'app-login',
   standalone: true,
   imports: [
-    DefaultLoginLayoutComponent,
+    DefaultloginLayoutComponent,
     ReactiveFormsModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class loginComponent {
   loginForm!: FormGroup;
 
-  constructor(private router: Router){
+  constructor(private router: Router) {
     this.loginForm = new FormGroup({
       qntVolta: new FormControl('', [Validators.required, Validators.min(1)]),
       data: new FormControl('', Validators.required),
-      hora: new FormControl('', Validators.required);
-    });
+      hora: new FormControl('', Validators.required)
+    })
   }
+
+
+  irParaAlimentar() {
+    console.log('apertou');
+    this.router.navigate(['/alimentar']);
+  }
+
 }
-
-irParaAlimentar() {
-  this.router.navigate(['/alimentar']);
-}
-
-
 

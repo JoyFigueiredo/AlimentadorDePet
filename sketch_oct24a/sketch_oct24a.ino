@@ -4,6 +4,9 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #include <NTPClient.h>
+#include <ESP8266WebServer.h>
+
+ESP8266WebServer server(80);
 
 // ===========================
 // HARDWARE CONFIG
@@ -19,12 +22,12 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 // Motor de passo
 #define STEP D3
 #define DIR D4
-const int PASSOS_POR_VOLTA = 800;  // 1/4 de passo
+const int PASSOS_POR_VOLTA = 800; // 1/4 de passo
 
 // ===========================
 // VARIÁVEIS DE MENU
 // ===========================
-String opcoes[] = { "Alimentar", "Horario" };
+String opcoes[] = {"Alimentar", "Horario"};
 const int totalOpcoes = sizeof(opcoes) / sizeof(opcoes[0]);
 
 String subAlimentar[5];
@@ -40,7 +43,6 @@ bool noPersonalizar = false;
 bool mostrandoHorario = false;
 bool mostrandoMenu = true;
 
-
 unsigned long ultimaAcao = 0;
 const unsigned long steps_base = 200;
 
@@ -48,16 +50,16 @@ const unsigned long steps_base = 200;
 // WIFI E HORA (NTP)
 // ===========================
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org", -10800, 60000);  // UTC-3 (Brasil)
+NTPClient timeClient(ntpUDP, "pool.ntp.org", -10800, 60000); // UTC-3 (Brasil)
 
 // Variável global para armazenar o horário atual
 String horaAtual = "";
 
-
 /*---------------------------------------------------------------------------------------------
 *                                      FUNÇÕES DE MENU
 ---------------------------------------------------------------------------------------------*/
-void atualizarSubmenu() {
+void atualizarSubmenu()
+{
   int idx = 0;
   subAlimentar[idx++] = "1/4 volta";
   subAlimentar[idx++] = "2/4 volta";
@@ -68,31 +70,38 @@ void atualizarSubmenu() {
   totalSubAlimentar = idx;
 }
 
-void mostrarMenu() {
+void mostrarMenu()
+{
   lcd.clear();
   int par = (opcaoAtual / 2) * 2;
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 2; i++)
+  {
     int idx = par + i;
-    if (idx >= totalOpcoes) break;
+    if (idx >= totalOpcoes)
+      break;
     lcd.setCursor(0, i);
     lcd.print(idx == opcaoAtual ? "> " : "  ");
     lcd.print(opcoes[idx]);
   }
 }
 
-void mostrarSubmenu() {
+void mostrarSubmenu()
+{
   lcd.clear();
   int par = (subOpcaoAtual / 2) * 2;
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 2; i++)
+  {
     int idx = par + i;
-    if (idx >= totalSubAlimentar) break;
+    if (idx >= totalSubAlimentar)
+      break;
     lcd.setCursor(0, i);
     lcd.print(idx == subOpcaoAtual ? "> " : "  ");
     lcd.print(subAlimentar[idx]);
   }
 }
 
-void mostrarMenuPersonalizar() {
+void mostrarMenuPersonalizar()
+{
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Giros: ");
@@ -105,9 +114,11 @@ void mostrarMenuPersonalizar() {
 *                                      FUNÇÕES MOTOR
 ---------------------------------------------------------------------------------------------*/
 
-void motorExecuta(int passos) {
+void motorExecuta(int passos)
+{
   digitalWrite(DIR, HIGH);
-  for (int i = 0; i < passos; i++) {
+  for (int i = 0; i < passos; i++)
+  {
     digitalWrite(STEP, HIGH);
     delayMicroseconds(4000);
     digitalWrite(STEP, LOW);
@@ -116,7 +127,8 @@ void motorExecuta(int passos) {
   digitalWrite(STEP, LOW);
 }
 
-void executarSubOpcao(float voltas) {
+void executarSubOpcao(float voltas)
+{
   // Apenas para uso com botões (LCD ativo)
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -136,9 +148,10 @@ void executarSubOpcao(float voltas) {
 /*---------------------------------------------------------------------------------------------
 *                                      SETUP
 ---------------------------------------------------------------------------------------------*/
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-  lcd.begin(16,2);
+  lcd.begin(16, 2);
   lcd.init();
   lcd.backlight();
 
@@ -166,7 +179,8 @@ void setup() {
 
   // Inicia WiFiManager
   WiFiManager wm;
-  if (!wm.autoConnect("AutoPet", "03121995")) {
+  if (!wm.autoConnect("AutoPet", "03121995"))
+  {
     lcd.clear();
     lcd.print("Falha WiFi!");
     delay(3000);
@@ -182,42 +196,78 @@ void setup() {
 
   atualizarSubmenu();
   mostrarMenu();
+
+  /*----------------------------------------
+   * INICIA SERVIDOR HTTP
+   *----------------------------------------*/
+  server.on("/alimentar", []()
+            {
+    String quantidade = server.arg("quantidade");
+    Serial.println("Quantidade recebida: " + quantidade);
+
+    // Habilita CORS
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+
+    float voltas = quantidade.toFloat();
+    executarSubOpcao(voltas); // reutiliza a função original
+
+    server.send(200, "text/plain", "Alimentado: " + quantidade); });
+
+  server.on("/hora", []()
+            {
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    timeClient.update();
+    String hora = timeClient.getFormattedTime();
+    server.send(200, "application/json", "{\"hora\":\"" + hora + "\"}"); });
+
+  server.begin();
+  Serial.println("Servidor HTTP iniciado!");
 }
 
 /*---------------------------------------------------------------------------------------------
 *                                      LOOP
 ---------------------------------------------------------------------------------------------*/
 
-void loop() {
+void loop()
+{
+  server.handleClient(); // processa requisições HTTP
   unsigned long agora = millis();
 
   // ==========================
   // Controle de menu via botões
   // ==========================
-  if ((agora - ultimaAcao) > steps_base) {
+  if ((agora - ultimaAcao) > steps_base)
+  {
 
     // --- MODO PERSONALIZAR ---
-    if (noPersonalizar) {
-      if (!digitalRead(BTN_LEFT)) {
+    if (noPersonalizar)
+    {
+      if (!digitalRead(BTN_LEFT))
+      {
         girosPersonalizados -= 0.1;
-        if (girosPersonalizados < 0.1) girosPersonalizados = 0.1;
+        if (girosPersonalizados < 0.1)
+          girosPersonalizados = 0.1;
         mostrarMenuPersonalizar();
         ultimaAcao = agora;
       }
-      if (!digitalRead(BTN_RIGHT)) {
+      if (!digitalRead(BTN_RIGHT))
+      {
         girosPersonalizados += 0.1;
-        if (girosPersonalizados > 10.0) girosPersonalizados = 10.0;
+        if (girosPersonalizados > 10.0)
+          girosPersonalizados = 10.0;
         mostrarMenuPersonalizar();
         ultimaAcao = agora;
       }
-      if (!digitalRead(BTN_SELECT)) {
+      if (!digitalRead(BTN_SELECT))
+      {
         personalizado = girosPersonalizados;
         atualizarSubmenu();
         noPersonalizar = false;
         mostrarSubmenu();
         ultimaAcao = agora;
       }
-      if (!digitalRead(BTN_BACK)) {
+      if (!digitalRead(BTN_BACK))
+      {
         noPersonalizar = false;
         mostrarSubmenu();
         ultimaAcao = agora;
@@ -226,57 +276,82 @@ void loop() {
     }
 
     // --- NAVEGAÇÃO ESQUERDA ---
-    if (!digitalRead(BTN_LEFT)) {
-      if (noSubmenu) {
+    if (!digitalRead(BTN_LEFT))
+    {
+      if (noSubmenu)
+      {
         subOpcaoAtual--;
-        if (subOpcaoAtual < 0) subOpcaoAtual = totalSubAlimentar - 1;
+        if (subOpcaoAtual < 0)
+          subOpcaoAtual = totalSubAlimentar - 1;
         mostrarSubmenu();
-      } else {
+      }
+      else
+      {
         opcaoAtual--;
-        if (opcaoAtual < 0) opcaoAtual = totalOpcoes - 1;
+        if (opcaoAtual < 0)
+          opcaoAtual = totalOpcoes - 1;
         mostrarMenu();
       }
       ultimaAcao = agora;
     }
 
     // --- NAVEGAÇÃO DIREITA ---
-    if (!digitalRead(BTN_RIGHT)) {
-      if (noSubmenu) {
+    if (!digitalRead(BTN_RIGHT))
+    {
+      if (noSubmenu)
+      {
         subOpcaoAtual++;
-        if (subOpcaoAtual >= totalSubAlimentar) subOpcaoAtual = 0;
+        if (subOpcaoAtual >= totalSubAlimentar)
+          subOpcaoAtual = 0;
         mostrarSubmenu();
-      } else {
+      }
+      else
+      {
         opcaoAtual++;
-        if (opcaoAtual >= totalOpcoes) opcaoAtual = 0;
+        if (opcaoAtual >= totalOpcoes)
+          opcaoAtual = 0;
         mostrarMenu();
       }
       ultimaAcao = agora;
     }
 
     // --- SELECIONAR ---
-    if (!digitalRead(BTN_SELECT)) {
-      if (noSubmenu) {
+    if (!digitalRead(BTN_SELECT))
+    {
+      if (noSubmenu)
+      {
         atualizarSubmenu();
-        if (subAlimentar[subOpcaoAtual] == "Personalizar") {
+        if (subAlimentar[subOpcaoAtual] == "Personalizar")
+        {
           noPersonalizar = true;
           mostrarMenuPersonalizar();
-        } else {
+        }
+        else
+        {
           float voltas = 0;
-          if (subOpcaoAtual == 0) voltas = 0.25;
-          else if (subOpcaoAtual == 1) voltas = 0.5;
-          else if (subOpcaoAtual == 2) voltas = 1.0;
+          if (subOpcaoAtual == 0)
+            voltas = 0.25;
+          else if (subOpcaoAtual == 1)
+            voltas = 0.5;
+          else if (subOpcaoAtual == 2)
+            voltas = 1.0;
           else if (subAlimentar[subOpcaoAtual].indexOf("voltas") != -1)
             voltas = personalizado;
 
           executarSubOpcao(voltas);
         }
-      } else {
-        if (opcoes[opcaoAtual] == "Alimentar") {
+      }
+      else
+      {
+        if (opcoes[opcaoAtual] == "Alimentar")
+        {
           noSubmenu = true;
           subOpcaoAtual = 0;
           atualizarSubmenu();
           mostrarSubmenu();
-        } else if (opcoes[opcaoAtual] == "Horario") {
+        }
+        else if (opcoes[opcaoAtual] == "Horario")
+        {
           mostrandoHorario = true;
           lcd.clear();
           lcd.setCursor(0, 0);
@@ -297,14 +372,20 @@ void loop() {
     }
 
     // --- VOLTAR ---
-    if (!digitalRead(BTN_BACK)) {
-      if (mostrandoHorario) {
+    if (!digitalRead(BTN_BACK))
+    {
+      if (mostrandoHorario)
+      {
         mostrandoHorario = false;
         mostrarMenu();
-      } else if (noSubmenu) {
+      }
+      else if (noSubmenu)
+      {
         noSubmenu = false;
         mostrarMenu();
-      } else {
+      }
+      else
+      {
         mostrarMenu();
       }
       ultimaAcao = agora;
