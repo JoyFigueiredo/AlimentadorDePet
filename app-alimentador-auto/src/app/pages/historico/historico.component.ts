@@ -11,15 +11,37 @@ import { EspService, Alimentacao } from '../../services/esp.service';
 })
 export class HistoricoComponent implements OnInit {
   historico: Alimentacao[] = [];
+  carregando = false;
 
   constructor(private espService: EspService) { }
 
   ngOnInit() {
-    this.historico = this.espService.obterHistorico();
+    this.carregarHistorico();
+  }
+
+  carregarHistorico() {
+    this.carregando = true;
+    this.espService.obterHistorico().subscribe({
+      next: (dados) => {
+        this.historico = dados;
+        this.carregando = false;
+      },
+      error: (err) => {
+        console.error('Erro:', err);
+        this.carregando = false;
+      }
+    });
   }
 
   resetar() {
-    this.espService.resetarHistorico();
-    this.historico = [];
+    if (confirm('Tem certeza que deseja limpar o histórico?')) {
+      this.espService.resetarHistorico().subscribe({
+        next: () => {
+          this.historico = [];
+          alert('Histórico resetado com sucesso!');
+        },
+        error: (err) => console.error('Erro ao resetar histórico:', err)
+      });
+    }
   }
 }

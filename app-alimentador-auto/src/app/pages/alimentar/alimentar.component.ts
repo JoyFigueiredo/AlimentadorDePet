@@ -30,14 +30,12 @@ export class AlimentarComponent {
   enviar() {
     this.espService.alimentar(this.quantidade).subscribe({
       next: () => {
-        alert(`Enviando ${this.quantidade} porções ao ESP!`);
-        this.espService.salvarHistorico(this.quantidade); // salva no localStorage
+        alert(`Simulação: ${this.quantidade}g enviadas!`);
+        this.espService.salvarHistorico(this.quantidade).subscribe();
       },
       error: (err) => {
-        console.error('Erro detalhado:', err);
-        alert('Erro ao enviar para o ESP.');
+        console.error('Erro:', err);
       }
     });
   }
-
 }

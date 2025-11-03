@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, delay } from 'rxjs';
 
 export interface Alimentacao {
+  id?: number;
   dataHora: string;
   quantidade: number;
 }
@@ -11,35 +11,42 @@ export interface Alimentacao {
   providedIn: 'root'
 })
 export class EspService {
-  private espUrl = 'http://192.168.1.50'; // IP do ESP
-  private storageKey = 'historicoAlimentacoes';
+  private storageKey = 'historicoAlimentacao';
 
-  constructor(private http: HttpClient) { }
+  constructor() { }
 
-  // Envia a alimentação para o ESP
+  /** Simula enviar o comando de alimentação */
   alimentar(quantidade: number): Observable<any> {
-    return this.http.get(`${this.espUrl}/alimentar?quantidade=${quantidade}`);
+    console.log(`Simulando envio de ${quantidade}g ao ESP...`);
+    return of({ sucesso: true }).pipe(delay(500)); // Simula 0.5s de atraso
   }
 
-  // Salva no histórico local (localStorage)
-  salvarHistorico(quantidade: number) {
-    const historico = this.obterHistorico();
-    historico.unshift({
-      dataHora: new Date().toISOString(),
+  /** Salva o registro localmente */
+  salvarHistorico(quantidade: number): Observable<any> {
+    const historico = this.obterHistoricoLocal();
+    const novoRegistro = {
+      id: Date.now(),
+      dataHora: new Date().toLocaleString(),
       quantidade
-    });
-    if (historico.length > 20) historico.pop();
+    };
+    historico.unshift(novoRegistro); // adiciona no início
     localStorage.setItem(this.storageKey, JSON.stringify(historico));
+    return of(novoRegistro).pipe(delay(300));
   }
 
-  // Obtém o histórico
-  obterHistorico(): Alimentacao[] {
-    const data = localStorage.getItem(this.storageKey);
-    return data ? JSON.parse(data) : [];
+  /** Obtém o histórico salvo localmente */
+  obterHistorico(): Observable<Alimentacao[]> {
+    return of(this.obterHistoricoLocal()).pipe(delay(200));
   }
 
-  // Limpa o histórico
-  resetarHistorico() {
+  private obterHistoricoLocal(): Alimentacao[] {
+    const dados = localStorage.getItem(this.storageKey);
+    return dados ? JSON.parse(dados) : [];
+  }
+
+  /** Reseta o histórico local */
+  resetarHistorico(): Observable<void> {
     localStorage.removeItem(this.storageKey);
+    return of(void 0).pipe(delay(200));
   }
 }

@@ -1,63 +1,67 @@
-import { Component } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { EspService, Alimentacao } from './services/esp.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    RouterOutlet,
-    CommonModule,
-    HeaderComponent,
-    FooterComponent
-  ],
+  imports: [CommonModule, FormsModule, RouterOutlet, HeaderComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = '🐾 Alimentador Automático';
-  menuSelecionado: string | null = null;
-  lcdText = 'Pronto';
-  horario: string | null = null;
+export class AppComponent implements OnInit {
+  quantidade: string = '0.1';
+  historico: Alimentacao[] = [];
+  carregando = false;
 
-  private espUrl = 'http://192.168.1.50'; // IP fixo do ESP
+  constructor(private espService: EspService) { }
 
-  constructor(private http: HttpClient) { }
-
-  selecionarMenu(menu: string) {
-    this.menuSelecionado = menu;
-    this.lcdText = `Menu: ${menu}`;
-
-    if (menu === 'horario') {
-      this.obterHorario();
-    }
+  ngOnInit() {
+    this.carregarHistorico();
   }
 
-  enviarAcao(acao: string) {
-    this.http.get(`${this.espUrl}/${acao}`).subscribe({
-      next: (res: any) => {
-        this.lcdText = `Executando: ${acao}`;
-        console.log('Comando enviado:', res);
+  alimentar() {
+    this.carregando = true;
+    this.espService.alimentar(parseFloat(this.quantidade)).subscribe({
+      next: () => {
+        this.carregando = false;
+        alert(`🐾 Alimentação de ${this.quantidade}g simulada!`);
+        this.salvarHistorico();
       },
       error: (err) => {
-        this.lcdText = 'Erro de conexão';
-        console.error(err);
+        this.carregando = false;
+        console.error('Erro:', err);
       }
     });
   }
 
-  obterHorario() {
-    this.http.get(`${this.espUrl}/hora`).subscribe({
-      next: (res: any) => {
-        this.horario = res.hora;
-        this.lcdText = `Hora: ${res.hora}`;
-      },
-      error: () => {
-        this.lcdText = 'Erro ao obter hora';
-      }
+  salvarHistorico() {
+    this.espService.salvarHistorico(parseFloat(this.quantidade)).subscribe({
+      next: () => this.carregarHistorico(),
+      error: (err) => console.error('Erro ao salvar histórico:', err)
     });
+  }
+
+  carregarHistorico() {
+    this.espService.obterHistorico().subscribe({
+      next: (dados) => (this.historico = dados),
+      error: (err) => console.error('Erro ao carregar histórico:', err)
+    });
+  }
+
+  resetarHistorico() {
+    if (confirm('Tem certeza que deseja limpar o histórico?')) {
+      this.espService.resetarHistorico().subscribe({
+        next: () => {
+          this.historico = [];
+          alert('Histórico resetado!');
+        },
+        error: (err) => console.error('Erro ao resetar histórico:', err)
+      });
+    }
   }
 }

@@ -2,40 +2,38 @@ package com.example.historico_auth_api.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import com.example.historico_auth_api.domain.Historico;
-import com.example.historico_auth_api.repositories.HistoricoRepository;
+import com.example.historico_auth_api.service.HistoricoService;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/qnt")
-@CrossOrigin(origins = "*") // permite o acesso do Angular
+@RequestMapping("/historico")
+@CrossOrigin(origins = "*")
 public class HistoricoController {
 
     @Autowired
-    private HistoricoRepository repository;
+    private HistoricoService service;
 
-    // ✅ Retorna todos os registros
+    // Retorna histórico
     @GetMapping
-    public List<Historico> listar() {
-        return repository.findAll();
+    public List<Historico> listarHistorico() {
+        return service.listarTodos();
     }
 
-    // ✅ Adiciona novo registro
+    // Reseta histórico
+    @DeleteMapping
+    public void resetarHistorico() {
+        service.deletarTodos();
+    }
+
+    // Salva nova alimentação
     @PostMapping
-    public Historico salvar(@RequestBody Historico novo) {
-        // define data/hora atuais automaticamente
-        novo.setData(LocalDate.now());
-        novo.setHora(LocalTime.now());
-        return repository.save(novo);
-    }
-
-    // ✅ Limpa o histórico
-    @DeleteMapping("/resetar")
-    public void resetar() {
-        repository.deleteAll();
+    public Historico alimentar(@RequestParam String quantidade) {
+        Historico h = new Historico();
+        h.setQnt(quantidade);
+        h.setData(java.time.LocalDate.now());
+        h.setHora(java.time.LocalTime.now());
+        return service.salvar(h);
     }
 }
