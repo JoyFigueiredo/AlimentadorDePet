@@ -7,13 +7,13 @@ import { EspService, Alimentacao } from '../../services/esp.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './historico.component.html',
-  styleUrls: ['./historico.component.css']
+  styleUrls: ['./historico.component.css'],
 })
 export class HistoricoComponent implements OnInit {
   historico: Alimentacao[] = [];
   carregando = false;
 
-  constructor(private espService: EspService) { }
+  constructor(private espService: EspService) {}
 
   ngOnInit() {
     this.carregarHistorico();
@@ -21,26 +21,33 @@ export class HistoricoComponent implements OnInit {
 
   carregarHistorico() {
     this.carregando = true;
-    this.espService.obterHistorico().subscribe({
+    this.espService.obterHistoricoBackend().subscribe({
       next: (dados) => {
-        this.historico = dados;
+        this.historico = dados
+          .sort((a, b) =>
+            a.dataHora && b.dataHora ? (a.dataHora < b.dataHora ? 1 : -1) : 0
+          )
+          .slice(0, 20);
         this.carregando = false;
       },
       error: (err) => {
-        console.error('Erro:', err);
+        console.error('Erro ao carregar histórico:', err);
         this.carregando = false;
-      }
+      },
     });
   }
 
   resetar() {
     if (confirm('Tem certeza que deseja limpar o histórico?')) {
-      this.espService.resetarHistorico().subscribe({
+      this.espService.resetarHistoricoBackend().subscribe({
         next: () => {
           this.historico = [];
           alert('Histórico resetado com sucesso!');
         },
-        error: (err) => console.error('Erro ao resetar histórico:', err)
+        error: (err) => {
+          console.error('Erro ao resetar histórico:', err);
+          alert('Erro ao resetar histórico.');
+        },
       });
     }
   }

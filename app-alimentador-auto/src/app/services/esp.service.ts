@@ -1,52 +1,40 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../pages/environments/environment';
 
 export interface Alimentacao {
-  id?: number;
-  dataHora: string;
-  quantidade: number;
+  id?: string;
+  qnt: string;
+  dataHora?: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class EspService {
-  private storageKey = 'historicoAlimentacao';
+  private apiUrl = environment.apiUrl; // http://192.168.2.114:9090
+  private espUrl = 'http://192.168.2.117/alimentar';
 
-  constructor() { }
+  constructor(private http: HttpClient) {}
 
-  /** Simula enviar o comando de alimentação */
+  /** Envia comando para ESP */
   alimentar(quantidade: number): Observable<any> {
-    console.log(`Simulando envio de ${quantidade}g ao ESP...`);
-    return of({ sucesso: true }).pipe(delay(500)); // Simula 0.5s de atraso
+    const params = { quantidade: quantidade.toString() };
+    return this.http.get(this.espUrl, { params, responseType: 'text' });
   }
 
-  /** Salva o registro localmente */
-  salvarHistorico(quantidade: number): Observable<any> {
-    const historico = this.obterHistoricoLocal();
-    const novoRegistro = {
-      id: Date.now(),
-      dataHora: new Date().toLocaleString(),
-      quantidade
-    };
-    historico.unshift(novoRegistro); // adiciona no início
-    localStorage.setItem(this.storageKey, JSON.stringify(historico));
-    return of(novoRegistro).pipe(delay(300));
+  /** Salva histórico no backend */
+  salvarHistoricoBackend(quantidade: number): Observable<Alimentacao> {
+    const historico = { qnt: quantidade.toString() };
+    return this.http.post<Alimentacao>(`${this.apiUrl}/historico`, historico);
   }
 
-  /** Obtém o histórico salvo localmente */
-  obterHistorico(): Observable<Alimentacao[]> {
-    return of(this.obterHistoricoLocal()).pipe(delay(200));
+  /** Obtém histórico do backend */
+  obterHistoricoBackend(): Observable<Alimentacao[]> {
+    return this.http.get<Alimentacao[]>(`${this.apiUrl}/historico`);
   }
 
-  private obterHistoricoLocal(): Alimentacao[] {
-    const dados = localStorage.getItem(this.storageKey);
-    return dados ? JSON.parse(dados) : [];
-  }
-
-  /** Reseta o histórico local */
-  resetarHistorico(): Observable<void> {
-    localStorage.removeItem(this.storageKey);
-    return of(void 0).pipe(delay(200));
+  /** Reseta histórico no backend */
+  resetarHistoricoBackend(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/historico`);
   }
 }

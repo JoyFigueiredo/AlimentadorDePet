@@ -1,42 +1,99 @@
+/* ====== Estilo base ====== */
 .header {
   position: fixed;
   top: 0;
   width: 100%;
   height: 70px;
-  background-color: #96C358; /* verde padrão */
+  background-color: #96c358;
   color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 40px;
+  padding: 0 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  z-index: 10;
+  z-index: 1000;
 }
 
 .left {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
 .logo {
-  height: 45px;
+  height: 40px;
   width: auto;
 }
 
 h1 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
+  margin: 0;
+}
+
+/* ====== Navegação (desktop) ====== */
+.nav {
+  display: flex;
+  gap: 20px;
 }
 
 .nav a {
   color: white;
   text-decoration: none;
   font-weight: 500;
-  margin-left: 20px;
   transition: opacity 0.2s;
 }
 
 .nav a:hover {
   opacity: 0.8;
+}
+
+/* ====== Botão do menu (mobile) ====== */
+.menu-button {
+  display: none;
+  color: white;
+  font-size: 26px;
+}
+
+/* ====== Responsividade (modo mobile) ====== */
+@media (max-width: 768px) {
+  .menu-button {
+    display: block;
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    position: absolute;
+    top: 70px;
+    right: 10px;
+    background-color: #96c358;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    width: 160px;
+    padding: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* Quando o menu está aberto */
+  .nav.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .nav a {
+    padding: 10px;
+    width: 100%;
+    text-align: right;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .nav a:last-child {
+    border-bottom: none;
+  }
 }

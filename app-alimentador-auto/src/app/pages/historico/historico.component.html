@@ -1,7 +1,9 @@
 <div class="historico-container">
   <h2>📜 Histórico das Últimas 20 Alimentações</h2>
 
-  <div *ngIf="historico.length === 0" class="mensagem-vazia">
+  <div *ngIf="carregando">🔄 Carregando...</div>
+
+  <div *ngIf="!carregando && historico.length === 0" class="mensagem-vazia">
     Nenhum registro encontrado.
   </div>
 
@@ -15,10 +17,12 @@
     <tbody>
       <tr *ngFor="let item of historico">
         <td>{{ item.dataHora | date:'dd/MM/yyyy HH:mm:ss' }}</td>
-        <td>{{ item.quantidade }}</td>
+        <td>{{ item.qnt }}</td>
       </tr>
     </tbody>
   </table>
 
-  <button *ngIf="historico.length > 0" (click)="resetar()">🗑️ Resetar Histórico</button>
+  <button *ngIf="historico.length > 0" (click)="resetar()">
+    🗑️ Resetar Histórico
+  </button>
 </div>

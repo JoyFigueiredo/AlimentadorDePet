@@ -1,8 +1,9 @@
 <app-default-login-layout
   title="Menu"
   primaryBtnText="Alimentar"
-  secondaryBtnText="Horario"
+  secondaryBtnText="Histórico"
   (primaryBtnClick)="irParaAlimentar()"
+  (secondaryBtnClick)="irParaHistorico()"
   >
   <form [formGroup]="loginForm">
 

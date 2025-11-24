@@ -8,12 +8,12 @@ import { EspService } from '../../services/esp.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './alimentar.component.html',
-  styleUrls: ['./alimentar.component.css']
+  styleUrls: ['./alimentar.component.css'],
 })
 export class AlimentarComponent {
   quantidade: number = 0.1;
 
-  constructor(private espService: EspService) { }
+  constructor(private espService: EspService) {}
 
   aumentar() {
     if (this.quantidade < 2) {
@@ -30,12 +30,11 @@ export class AlimentarComponent {
   enviar() {
     this.espService.alimentar(this.quantidade).subscribe({
       next: () => {
-        alert(`Simulação: ${this.quantidade}g enviadas!`);
-        this.espService.salvarHistorico(this.quantidade).subscribe();
+        this.espService.salvarHistoricoBackend(this.quantidade).subscribe();
       },
       error: (err) => {
         console.error('Erro:', err);
-      }
+      },
     });
   }
 }

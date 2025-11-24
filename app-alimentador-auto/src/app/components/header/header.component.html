@@ -4,9 +4,29 @@
     <h1>{{ title }}</h1>
   </div>
 
-  <nav class="nav">
-    <a routerLink="/"> Início</a>
-    <a routerLink="/historico">Historico</a>
-    <a routerLink="/alimentar" routerLinkActive="active">Alimentar</a>
+  <!-- Botão Material para telas pequenas -->
+  <button
+    mat-icon-button
+    class="menu-button"
+    (click)="alternarMenu()"
+    aria-label="Abrir menu"
+  >
+    <mat-icon>{{ menuAberto ? 'close' : 'menu' }}</mat-icon>
+  </button>
+
+  <!-- Navegação -->
+  <nav class="nav" [class.open]="menuAberto">
+    <a routerLink="/" routerLinkActive="active" (click)="fecharMenu()">Início</a>
+    <a routerLink="/historico" routerLinkActive="active" (click)="fecharMenu()">Histórico</a>
+    <a routerLink="/alimentar" routerLinkActive="active" (click)="fecharMenu()">Alimentar</a>
+    <!-- 🔹 Link externo para o ESP -->
+    <a
+      href="http://192.168.2.117/wifi"
+      target="_blank"
+      rel="noopener noreferrer"
+      (click)="fecharMenu()"
+    >
+      Configurar Wi-Fi
+    </a>
   </nav>
 </header>
