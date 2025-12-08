@@ -1,35 +1,69 @@
 .historico-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
+  width: 100%;
+  padding-bottom: 40px;
 }
 
+/* Caixa envolvendo a tabela */
+.tabela-box {
+  background: #f3f3f3;
+  padding: 20px;
+  border-radius: 12px;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-top: 20px;
+}
+
+/* Tabela */
 table {
-    border-collapse: collapse;
-    width: 80%;
-    margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
 }
 
-th,
-td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: center;
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  text-align: center;
+}
+
+thead {
+  background: #96C358;
+  color: white;
+  font-weight: bold;
+}
+
+tr:last-child td {
+  border-bottom: none;
 }
 
 .mensagem-vazia {
-    margin-top: 30px;
-    font-size: 18px;
-    color: #888;
+  margin-top: 20px;
+  font-size: 18px;
+  color: #777;
 }
 
-button {
-    margin-top: 20px;
-    padding: 8px 16px;
-    border-radius: 6px;
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    cursor: pointer;
+.carregando {
+  margin-top: 10px;
+  color: #96C358;
+  font-weight: bold;
+}
+
+/* Botão igual ao dos outros componentes */
+.btn-reset {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.btn-reset:hover {
+  background: #c0392b;
 }

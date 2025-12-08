@@ -1,6 +1,7 @@
 package com.example.historico_auth_api.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.historico_auth_api.domain.Historico;
 import com.example.historico_auth_api.service.HistoricoService;
@@ -27,13 +28,9 @@ public class HistoricoController {
         service.deletarTodos();
     }
 
-    // Salva nova alimentação
     @PostMapping
-    public Historico alimentar(@RequestParam String quantidade) {
-        Historico h = new Historico();
-        h.setQnt(quantidade);
-        h.setData(java.time.LocalDate.now());
-        h.setHora(java.time.LocalTime.now());
-        return service.salvar(h);
+    public Historico alimentar(@RequestBody Historico historico) {
+        historico.setDataHora(java.time.LocalDateTime.now());
+        return service.salvar(historico);
     }
 }

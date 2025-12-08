@@ -37,4 +37,20 @@ export class EspService {
   resetarHistoricoBackend(): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/historico`);
   }
+
+  // =====================================
+  // AGENDAMENTOS
+  // =====================================
+
+  obterAgendamentos() {
+    return this.http.get<any[]>(`${this.apiUrl}/agendamentos`);
+  }
+
+  salvarAgendamento(agendamento: any) {
+    return this.http.post(`${this.apiUrl}/agendamentos`, agendamento);
+  }
+
+  deletarAgendamento(id: string) {
+    return this.http.delete(`${this.apiUrl}/agendamentos/${id}`);
+  }
 }

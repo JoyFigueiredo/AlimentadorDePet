@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DefaultloginLayoutComponent } from '../../components/default-login-layout/default-login-layout.component';
+
 import {
   FormControl,
   FormGroup,
@@ -7,19 +7,20 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DefaultinicioLayoutComponent } from '../../components/default-inicio-layout/default-inicio-layout.component';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-inicio',
   standalone: true,
-  imports: [DefaultloginLayoutComponent, ReactiveFormsModule],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
+  imports: [DefaultinicioLayoutComponent, ReactiveFormsModule],
+  templateUrl: './inicio.component.html',
+  styleUrls: ['./inicio.component.css'],
 })
-export class loginComponent {
-  loginForm!: FormGroup;
+export class InicioComponent {
+  inicioForm!: FormGroup;
 
   constructor(private router: Router) {
-    this.loginForm = new FormGroup({
+    this.inicioForm = new FormGroup({
       qntVolta: new FormControl('', [Validators.required, Validators.min(1)]),
       data: new FormControl('', Validators.required),
       hora: new FormControl('', Validators.required),

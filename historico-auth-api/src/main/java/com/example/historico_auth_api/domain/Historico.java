@@ -1,6 +1,7 @@
 package com.example.historico_auth_api.domain;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,6 +18,5 @@ public class Historico {
     private String id;
 
     private String qnt;
-    private LocalDate data;
-    private LocalTime hora;
+    private LocalDateTime dataHora;
 }

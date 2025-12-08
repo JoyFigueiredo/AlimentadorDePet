@@ -1,0 +1,32 @@
+<main>
+  <section class="form-section">
+    <img class="logo" src="/assets/svg/logo.svg" />
+    <h1>{{title}}</h1>
+
+    <ng-content></ng-content>
+
+    <div class="btn-wrapper">
+      <button (click)="onPrimaryClick()" class="btn-primary">{{primaryBtnText}}</button>
+      <div class="divider">
+        <div></div>
+        <span>ou</span>
+        <div></div>
+      </div>
+      <button (click)="onSecondaryClick()" class="btn-secondary">{{secondaryBtnText}}</button>
+    </div>
+
+    <!-- Texto informativo sobre alimentação dos pets -->
+    <div class="info-pets">
+      <h2>Alimentação balanceada dos pets</h2>
+      <p>
+        Garantir que cães e gatos recebam a quantidade correta de ração diariamente é essencial
+        para sua saúde e bem-estar. Alimentação irregular ou excessiva pode levar à obesidade,
+        um problema comum que afeta tanto pets quanto humanos.
+      </p>
+      <p>
+        Com uma rotina alimentar controlada, é possível prevenir doenças, manter o peso ideal
+        e proporcionar uma vida ativa e saudável para seus animais de estimação.
+      </p>
+    </div>
+  </section>
+</main>

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { EspService } from '../../services/esp.service';
 
 @Component({
@@ -13,7 +14,7 @@ import { EspService } from '../../services/esp.service';
 export class AlimentarComponent {
   quantidade: number = 0.1;
 
-  constructor(private espService: EspService) {}
+  constructor(private espService: EspService, private router: Router) {}
 
   aumentar() {
     if (this.quantidade < 2) {
@@ -36,5 +37,10 @@ export class AlimentarComponent {
         console.error('Erro:', err);
       },
     });
+  }
+
+  programar() {
+    // Navega para a página de alarme
+    this.router.navigate(['/alarme']);
   }
 }

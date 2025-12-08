@@ -1,6 +1,6 @@
 #FileLock
-#Sat Nov 01 15:38:35 BRT 2025
-server=192.168.56.1\:53053
+#Wed Nov 26 17:14:23 BRT 2025
+server=192.168.56.1\:51796
 hostName=PC_Joice
 method=file
-id=19a40b6b55644299f35d04868f21fa41f08e4d72f21
+id=19ac1cd6a6259d03af3e303f760b45d8ca33740907a

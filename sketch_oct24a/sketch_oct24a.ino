@@ -5,6 +5,8 @@
 #include <WiFiUdp.h>
 #include <NTPClient.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPClient.h>   
+#include <WiFiClient.h> 
 
 ESP8266WebServer server(80);
 
@@ -17,11 +19,11 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define BTN_LEFT D5
 #define BTN_RIGHT D6
 #define BTN_SELECT D7
-#define BTN_BACK D0
+#define BTN_BACK D4
 
 // Motor de passo
 #define STEP D3
-#define DIR D4
+#define DIR D8
 const int PASSOS_POR_VOLTA = 800; // 1/4 de passo
 
 // ===========================
@@ -111,6 +113,25 @@ void mostrarMenuPersonalizar()
 }
 
 /*---------------------------------------------------------------------------------------------
+*                                      FUNÇÕES HORA (CORRIGIDO)
+---------------------------------------------------------------------------------------------*/
+
+// Atualiza e exibe a hora apenas quando solicitado no menu
+void mostrarHoraAtual()
+{
+  yield();
+  timeClient.update();
+  yield();
+  horaAtual = timeClient.getFormattedTime();
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Hora atual:");
+  lcd.setCursor(3, 1);
+  lcd.print(horaAtual);
+}
+
+/*---------------------------------------------------------------------------------------------
 *                                      FUNÇÕES MOTOR
 ---------------------------------------------------------------------------------------------*/
 
@@ -120,12 +141,19 @@ void motorExecuta(int passos)
   for (int i = 0; i < passos; i++)
   {
     digitalWrite(STEP, HIGH);
-    delayMicroseconds(4000);
+    delayMicroseconds(8000);
     digitalWrite(STEP, LOW);
-    delayMicroseconds(4000);
+    delayMicroseconds(8000);
+    yield();
   }
   digitalWrite(STEP, LOW);
 }
+
+void motorVoltas(float voltas) {
+  int passos = voltas * PASSOS_POR_VOLTA;
+  motorExecuta(passos);
+}
+
 
 void executarSubOpcao(float voltas)
 {
@@ -136,14 +164,45 @@ void executarSubOpcao(float voltas)
   lcd.setCursor(0, 1);
   lcd.print(voltas, 2);
 
-  int passos = voltas * PASSOS_POR_VOLTA;
-  motorExecuta(passos);
+  motorVoltas(voltas);
+
+  enviarHistoricoBackend(voltas);
 
   delay(1000);
   noSubmenu = false;
   mostrandoMenu = true;
   mostrarMenu();
 }
+
+/*---------------------------------------------------------------------------------------------
+*                                      Historico para Backend
+---------------------------------------------------------------------------------------------*/
+void enviarHistoricoBackend(float voltas)
+{
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    Serial.println("WiFi não conectado. Histórico não enviado.");
+    return;
+  }
+
+  WiFiClient client;
+  HTTPClient http;
+
+  http.begin(client, "http://192.168.2.114:9090/historico");
+  http.addHeader("Content-Type", "application/json");
+
+  // O backend espera "qnt", mas você enviava "quantidade" !!!
+  // Corrigido abaixo:
+  String json = "{\"qnt\": \"" + String(voltas, 2) + "\"}";
+
+  int httpResponseCode = http.POST(json);
+
+  Serial.print("Envio ao backend: ");
+  Serial.println(httpResponseCode);
+
+  http.end();
+}
+
 
 /*---------------------------------------------------------------------------------------------
 *                                      SETUP
@@ -173,12 +232,13 @@ void setup()
   // -------------------------
   // WiFi com IP fixo
   // -------------------------
-  IPAddress local_IP(192, 168, 1, 50);
+  IPAddress local_IP(192, 168, 2, 117);
   IPAddress gateway(192, 168, 1, 1);
   IPAddress subnet(255, 255, 255, 0);
 
   // Inicia WiFiManager
   WiFiManager wm;
+  WiFi.config(local_IP, gateway, subnet);
   if (!wm.autoConnect("AutoPet", "03121995"))
   {
     lcd.clear();
@@ -209,7 +269,7 @@ void setup()
     server.sendHeader("Access-Control-Allow-Origin", "*");
 
     float voltas = quantidade.toFloat();
-    executarSubOpcao(voltas); // reutiliza a função original
+    motorVoltas(voltas);  // reutiliza a função original
 
     server.send(200, "text/plain", "Alimentado: " + quantidade); });
 
@@ -219,6 +279,34 @@ void setup()
     timeClient.update();
     String hora = timeClient.getFormattedTime();
     server.send(200, "application/json", "{\"hora\":\"" + hora + "\"}"); });
+
+  // Página para reconfigurar Wi-Fi
+  server.on("/wifi", []()
+            {
+    String html = "<!DOCTYPE html>"
+                  "<html lang='pt-BR'>"
+                  "<head><meta charset='UTF-8'><title>Configuração Wi-Fi</title></head>"
+                  "<body style='font-family:sans-serif;text-align:center;margin-top:50px;'>"
+                  "<h2>Configuração Wi-Fi</h2>"
+                  "<p>Rede atual: "
+                  + WiFi.SSID() + "</p>"
+                                  "<button onclick=\"location.href='/reconfigurar'\" "
+                                  "style='padding:10px 20px;font-size:16px;'>Trocar Wi-Fi</button>"
+                                  "</body></html>";
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/html", html); });
+
+  server.on("/reconfigurar", []()
+            {
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/html", "<!DOCTYPE html><html lang='pt-BR'><meta charset='UTF-8'>"
+                                  "<body style='font-family:sans-serif;text-align:center;margin-top:50px;'>"
+                                  "<h3>Reiniciando para reconfigurar Wi-Fi...</h3>"
+                                  "</body></html>");
+    delay(1000);
+    WiFiManager wm;
+    wm.resetSettings();  // Apaga a rede salva
+    ESP.restart(); });
 
   server.begin();
   Serial.println("Servidor HTTP iniciado!");
@@ -238,6 +326,19 @@ void loop()
   // ==========================
   if ((agora - ultimaAcao) > steps_base)
   {
+
+    // --- SE ESTIVER MOSTRANDO HORA ---
+    if (mostrandoHorario)
+    {
+      // Permite voltar com o botão BACK
+      if (!digitalRead(BTN_BACK))
+      {
+        mostrandoHorario = false;
+        mostrarMenu();
+        ultimaAcao = agora;
+      }
+      return; // ignora o resto do menu enquanto mostra hora
+    }
 
     // --- MODO PERSONALIZAR ---
     if (noPersonalizar)
@@ -356,37 +457,26 @@ void loop()
           lcd.clear();
           lcd.setCursor(0, 0);
           lcd.print("Obtendo hora...");
-
-          // Atualiza a hora APENAS agora
-          timeClient.update();
-          horaAtual = timeClient.getFormattedTime();
-
-          lcd.clear();
-          lcd.setCursor(0, 0);
-          lcd.print("Hora atual:");
-          lcd.setCursor(3, 1);
-          lcd.print(horaAtual);
+          delay(500);
+          mostrarHoraAtual();
+          yield();
         }
       }
       ultimaAcao = agora;
     }
 
-    // --- VOLTAR ---
+    // Botão BACK
     if (!digitalRead(BTN_BACK))
     {
-      if (mostrandoHorario)
-      {
-        mostrandoHorario = false;
-        mostrarMenu();
-      }
-      else if (noSubmenu)
+      if (noSubmenu)
       {
         noSubmenu = false;
         mostrarMenu();
       }
-      else
+      else if (noPersonalizar)
       {
-        mostrarMenu();
+        noPersonalizar = false;
+        mostrarSubmenu();
       }
       ultimaAcao = agora;
     }

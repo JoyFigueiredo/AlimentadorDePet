@@ -1,13 +1,20 @@
 .alimentar-container {
-  display: flex;
+   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 50px;
+  align-items: center;    /* centraliza horizontalmente */
+  min-height: 100vh;      /* ocupa toda a altura da tela */
+  width: 100%;
+  max-width: 400px;       /* opcional, limita a largura */
+  margin: 0 auto;         /* centraliza horizontal em telas grandes */
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;     /* centraliza textos e inputs */
 }
 
 .controle {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   margin: 20px 0;
 }
@@ -18,12 +25,38 @@ input[type="number"] {
   font-size: 18px;
 }
 
-button.enviar {
+button.enviar, button.programar {
   padding: 10px 20px;
   font-size: 16px;
-  background-color: #96C358;
-  color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+button.enviar {
+  background-color: #96C358;
+  color: white;
+}
+
+button.programar {
+  background-color: #62C0B7;
+  color: white;
+}
+
+.info-alimentacao {
+  margin-top: 20px;
+  background-color: #f0f7f5;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+
+.historico-ultimo {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #333;
 }
