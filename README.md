@@ -1,5 +1,24 @@
 
-# Alimentador Automático de Pets 🐾
+
+<h1 align="center">Alimentador Automático de Pets 🐾</h1>
+
+p align="center">
+Projeto desenvolvido como <strong>Trabalho de Conclusão de Curso (TCC)</strong>, com o objetivo de automatizar a alimentação de animais de estimação por meio de <strong>sistemas embarcados</strong>, proporcionando controle de horários e porções de ração.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/status-em%20desenvolvimento-yellow" alt="Status">
+  <img src="https://img.shields.io/badge/versão-1.0.0-blue" alt="Versão">
+  <img src="https://img.shields.io/badge/TCC-acadêmico-purple" alt="TCC">
+</p>
+
+> **Stack principal:** C/C++ (Arduino)  
+> **Plataforma alvo:** Arduino (UNO / Nano / similares)  
+> **Área:** Sistemas Embarcados e Automação  
+> **Propósito:** Projeto acadêmico para automatização da alimentação de pets
+
+---
+# 
 
 ## 📌 Descrição do Projeto
 
@@ -93,4 +112,5 @@ GitHub: https://github.com/JoyFigueiredo
 
 Este projeto possui caráter acadêmico.  
 O uso total ou parcial do código é permitido para fins educacionais, desde que citada a autoria.
+
 
