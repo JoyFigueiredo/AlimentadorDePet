@@ -2,7 +2,7 @@
 
 <h1 align="center">Alimentador Automático de Pets 🐾</h1>
 
-p align="center">
+<p align="center">
 Projeto desenvolvido como <strong>Trabalho de Conclusão de Curso (TCC)</strong>, com o objetivo de automatizar a alimentação de animais de estimação por meio de <strong>sistemas embarcados</strong>, proporcionando controle de horários e porções de ração.
 </p>
 
@@ -112,5 +112,6 @@ GitHub: https://github.com/JoyFigueiredo
 
 Este projeto possui caráter acadêmico.  
 O uso total ou parcial do código é permitido para fins educacionais, desde que citada a autoria.
+
 
 
